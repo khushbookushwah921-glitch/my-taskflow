@@ -333,7 +333,7 @@ const handleDeleteTask = async (taskId) => {
 
   return (
     <div style={styles.dashboard}>
-      <style>{`
+     <style>{`
   @keyframes livePulse {
     0%, 100% {
       opacity: 1;
@@ -344,6 +344,135 @@ const handleDeleteTask = async (taskId) => {
       opacity: 0.3;
       transform: scale(0.75);
     }
+  }
+
+  /* ===== TABLET ===== */
+  @media (max-width: 768px) {
+
+    nav {
+      padding: 15px 20px !important;
+      min-height: auto !important;
+      gap: 15px;
+    }
+
+    nav > div:first-child {
+      flex: 1;
+    }
+
+    main {
+      padding: 25px 15px 50px !important;
+    }
+
+    /* Statistics */
+    div[style*="repeat(3, 1fr)"] {
+      grid-template-columns: 1fr !important;
+    }
+
+    /* Forms */
+    div[style*="repeat(3, 1fr)"] {
+      grid-template-columns: 1fr !important;
+    }
+
+    /* Tasks */
+    div[style*="repeat(2, 1fr)"] {
+      grid-template-columns: 1fr !important;
+    }
+
+    /* Toolbar */
+    div[style*="1fr 190px"] {
+      grid-template-columns: 1fr !important;
+    }
+
+    /* Section */
+    section {
+      padding: 20px !important;
+    }
+
+    /* Form row */
+    div[style*="formRow"] {
+      grid-template-columns: 1fr !important;
+    }
+
+    /* Project cards */
+    div[style*="projectGrid"] {
+      grid-template-columns: 1fr !important;
+    }
+  }
+
+  /* ===== MOBILE ===== */
+  @media (max-width: 480px) {
+
+    nav {
+      padding: 14px 12px !important;
+    }
+
+    nav h2 {
+      font-size: 21px !important;
+    }
+
+    nav p {
+      font-size: 10px !important;
+    }
+
+    main {
+      padding: 20px 10px 35px !important;
+    }
+
+    section {
+      padding: 16px !important;
+      border-radius: 12px !important;
+    }
+
+    h1 {
+      font-size: 26px !important;
+    }
+
+    h2 {
+      font-size: 20px !important;
+    }
+
+    /* Section headers */
+    section > div:first-child {
+      gap: 12px;
+    }
+
+    /* Buttons */
+    button {
+      max-width: 100%;
+    }
+
+    /* Forms */
+    input,
+    select,
+    textarea {
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+
+    /* Task cards */
+    div[style*="taskCard"] {
+      padding: 16px !important;
+    }
+
+    /* Task actions */
+    div[style*="taskActions"] {
+      flex-direction: column !important;
+    }
+
+    div[style*="taskActions"] button {
+      width: 100%;
+    }
+
+    /* Project cards */
+    div[style*="projectCard"] {
+      padding: 16px !important;
+    }
+
+    /* Stats */
+    div[style*="statCard"] {
+      padding: 17px !important;
+    }
+
   }
 `}</style>
 
