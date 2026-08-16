@@ -1,51 +1,103 @@
 # TaskFlow — Full-Stack AI-Assisted Task Management Platform
 
-TaskFlow is a full-stack task and project management platform designed to help users organize projects, manage tasks, track progress, and quickly find tasks using efficient algorithms.
+TaskFlow is a full-stack task and project management platform built with FastAPI, SQLAlchemy, SQLite, and a JavaScript frontend.
 
-The application includes secure user authentication, project management, task management, statistics, algorithm-powered search and sorting, and an AI-assisted Quick-Add feature.
+It provides secure authentication, project and task management, task statistics, algorithm-powered sorting and searching, and an AI-assisted Quick-Add feature using a deterministic mock parser with zero API keys and zero network calls.
 
 ---
 
-## Features
+## 1. Features
 
-### 1. User Authentication
+### Authentication
 - User registration
 - Secure password hashing
-- User login
-- JWT-based authentication
-- Protected project and task APIs
-- Current user information endpoint
+- JWT-based login
+- Protected project and task endpoints
+- Current-user endpoint
 
-### 2. Project Management
+### Project Management
 - Create projects
-- View projects
+- List projects
 - Delete projects
-- Projects are associated with the authenticated user
-- Users can only access their own projects
+- User-specific project access
 
-### 3. Task Management
-- Create tasks inside projects
-- View all tasks
-- View a task by ID
+### Task Management
+- Create tasks
+- List tasks
+- Get task by ID
 - Update task status
 - Delete tasks
-- Task priority support:
-  - Low
-  - Medium
-  - High
-- Due date support
+- Priority: low, medium, high
+- Due-date support
 - Task description support
 
-### 4. Task Search
+### Statistics
+- Project-level task statistics
+- Progress/status information
 
-TaskFlow supports two search algorithms:
-
+### Algorithms
+- Insertion Sort
 - Binary Search
 - Linear Search
+- Benchmark comparison
 
-Binary Search first sorts task records and then searches efficiently.
+### AI Quick-Add
+The Quick-Add feature accepts natural-language task descriptions and converts them into structured task data.
 
-The search API allows the algorithm to be selected using:
+Example:
+
+`Finish the report high priority tomorrow`
+
+The parser extracts:
+- title
+- priority
+- due-date hint
+
+The required implementation uses a local mock parser and requires no API key or network connection.
+
+---
+
+# 2. Tech Stack
+
+## Backend
+- Python
+- FastAPI
+- SQLAlchemy
+- Pydantic
+- SQLite
+- Uvicorn
+- JWT authentication
+- Passlib / bcrypt
+
+## Frontend
+- React
+- JavaScript
+- HTML
+- CSS
+- Fetch API
+- LocalStorage
+
+---
+
+# 3. Project Structure
 
 ```text
-algo=binary
+TaskFlow/
+├── backend/
+│   └── app/
+│       ├── main.py
+│       ├── models.py
+│       ├── schemas.py
+│       ├── crud.py
+│       ├── database.py
+│       ├── auth.py
+│       └── algorithms.py
+│
+├── frontend/
+│   └── src/
+│       └── App.jsx
+│
+├── benchmark.py
+├── check_algorithms.py
+├── requirements.txt
+└── README.md

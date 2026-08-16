@@ -1,105 +1,103 @@
-def insertion_sort(records, key):
-    for i in range(1, len(records)):
-        current = records[i]
-        j = i - 1
+# TaskFlow — Full-Stack AI-Assisted Task Management Platform
 
-        while j >= 0 and records[j][key] > current[key]:
-            records[j + 1] = records[j]
-            j -= 1
+TaskFlow is a full-stack task and project management platform built with FastAPI, SQLAlchemy, SQLite, and a JavaScript frontend.
 
-        records[j + 1] = current
+It provides secure authentication, project and task management, task statistics, algorithm-powered sorting and searching, and an AI-assisted Quick-Add feature using a deterministic mock parser with zero API keys and zero network calls.
 
+---
 
-def binary_search(sorted_records, target_value, key):
-    low = 0
-    high = len(sorted_records) - 1
+## 1. Features
 
-    while low <= high:
-        mid = (low + high) // 2
+### Authentication
+- User registration
+- Secure password hashing
+- JWT-based login
+- Protected project and task endpoints
+- Current-user endpoint
 
-        if sorted_records[mid][key] == target_value:
-            return mid
+### Project Management
+- Create projects
+- List projects
+- Delete projects
+- User-specific project access
 
-        if sorted_records[mid][key] < target_value:
-            low = mid + 1
-        else:
-            high = mid - 1
+### Task Management
+- Create tasks
+- List tasks
+- Get task by ID
+- Update task status
+- Delete tasks
+- Priority: low, medium, high
+- Due-date support
+- Task description support
 
-    return -1
+### Statistics
+- Project-level task statistics
+- Progress/status information
 
+### Algorithms
+- Insertion Sort
+- Binary Search
+- Linear Search
+- Benchmark comparison
 
-def linear_search(records, target_value, key):
-    for index, record in enumerate(records):
-        if record[key] == target_value:
-            return index
+### AI Quick-Add
+The Quick-Add feature accepts natural-language task descriptions and converts them into structured task data.
 
-    return -1
+Example:
 
+`Finish the report high priority tomorrow`
 
-# -----------------------------
-# COUNTING VERSIONS
-# -----------------------------
+The parser extracts:
+- title
+- priority
+- due-date hint
 
-def insertion_sort_count(records, key):
-    comparisons = 0
+The required implementation uses a local mock parser and requires no API key or network connection.
 
-    for i in range(1, len(records)):
-        current = records[i]
-        j = i - 1
+---
 
-        while j >= 0:
-            comparisons += 1
+# 2. Tech Stack
 
-            if records[j][key] > current[key]:
-                records[j + 1] = records[j]
-                j -= 1
-            else:
-                break
+## Backend
+- Python
+- FastAPI
+- SQLAlchemy
+- Pydantic
+- SQLite
+- Uvicorn
+- JWT authentication
+- Passlib / bcrypt
 
-        records[j + 1] = current
+## Frontend
+- React
+- JavaScript
+- HTML
+- CSS
+- Fetch API
+- LocalStorage
 
-    return comparisons
+---
 
+# 3. Project Structure
 
-def binary_search_count(sorted_records, target_value, key):
-    low = 0
-    high = len(sorted_records) - 1
-    comparisons = 0
-
-    while low <= high:
-        mid = (low + high) // 2
-        comparisons += 1
-
-        if sorted_records[mid][key] == target_value:
-            return {
-                "index": mid,
-                "comparison_count": comparisons
-            }
-
-        if sorted_records[mid][key] < target_value:
-            low = mid + 1
-        else:
-            high = mid - 1
-
-    return {
-        "index": -1,
-        "comparison_count": comparisons
-    }
-
-
-def linear_search_count(records, target_value, key):
-    comparisons = 0
-
-    for index, record in enumerate(records):
-        comparisons += 1
-
-        if record[key] == target_value:
-            return {
-                "index": index,
-                "comparison_count": comparisons
-            }
-
-    return {
-        "index": -1,
-        "comparison_count": comparisons
-    }
+```text
+TaskFlow/
+├── backend/
+│   └── app/
+│       ├── main.py
+│       ├── models.py
+│       ├── schemas.py
+│       ├── crud.py
+│       ├── database.py
+│       ├── auth.py
+│       └── algorithms.py
+│
+├── frontend/
+│   └── src/
+│       └── App.jsx
+│
+├── benchmark.py
+├── check_algorithms.py
+├── requirements.txt
+└── README.md
