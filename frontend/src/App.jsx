@@ -12,6 +12,7 @@ function App() {
   const [tasks, setTasks] = useState([]);
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [taskTitle, setTaskTitle] = useState("");
+  const [taskDescription, setTaskDescription] = useState("");
   const [taskPriority, setTaskPriority] = useState("medium");
   const [taskDueDate, setTaskDueDate] = useState("");
   const [taskProjectId, setTaskProjectId] = useState("");
@@ -167,6 +168,7 @@ const loadTasks = async (token) => {
         },
         body: JSON.stringify({
           title: taskTitle,
+          description: taskDescription,
           priority: taskPriority,
           due_date: taskDueDate || null,
           project_id: Number(taskProjectId),
@@ -183,6 +185,7 @@ const loadTasks = async (token) => {
     setTasks([...tasks, data]);
 
     setTaskTitle("");
+    setTaskDescription("");
     setTaskPriority("medium");
     setTaskDueDate("");
     setTaskProjectId("");
@@ -764,6 +767,23 @@ const handleDeleteTask = async (taskId) => {
                   required
                 />
               </div>
+
+              <div style={styles.formGroup}>
+  <label>Description</label>
+
+  <textarea
+    placeholder="Enter task description"
+    value={taskDescription}
+    onChange={(e) =>
+      setTaskDescription(e.target.value)
+    }
+    style={{
+      ...styles.input,
+      minHeight: "80px",
+      resize: "vertical",
+    }}
+  />
+</div>
 
               <div style={styles.formRow}>
 
