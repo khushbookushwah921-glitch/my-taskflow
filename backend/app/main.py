@@ -1,9 +1,11 @@
+from pydantic import BaseModel
+from app.algorithms import insertion_sort, binary_search, linear_search
 from fastapi import FastAPI, Depends, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 import time
-
+from app.quick_add import parse_quick_add
 from app.database import Base, engine, get_db
 from app import models, schemas, crud
 from app.auth import create_access_token, get_current_user
@@ -232,24 +234,105 @@ def create_task(
 # -----------------------------
 # TASKS - LIST
 # -----------------------------
-
 @app.get(
     "/tasks",
     response_model=list[schemas.TaskResponse]
 )
 def get_tasks(
+    sort: str | None = None,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)
 ):
-    return crud.get_tasks(
-        db,
-        current_user.id
-    )
+    tasks = crud.get_tasks(db, current_user.id)
+
+    if sort == "priority":
+        records = [
+            {
+                "id": task.id,
+                "title": task.title,
+                "priority": task.priority,
+                "due_date": task.due_date,
+                "project_id": task.project_id,
+                "status": task.status
+            }
+            for task in tasks
+        ]
+
+        priority_rank = {
+            "low": 1,
+            "medium": 2,
+            "high": 3
+        }
+
+        for record in records:
+            record["_priority_rank"] = priority_rank.get(
+                record["priority"], 2
+            )
+
+        insertion_sort(records, "_priority_rank")
+
+        for record in records:
+            record.pop("_priority_rank", None)
+
+        return records
+
+    return tasks
 
 
 # -----------------------------
 # TASKS - GET BY ID
 # -----------------------------
+@app.get("/tasks/search", response_model=schemas.TaskResponse)
+def search_tasks(
+    title: str,
+    algo: str = "binary",
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    tasks = crud.get_tasks(db, current_user.id)
+
+    records = [
+        {
+            "id": task.id,
+            "title": task.title
+        }
+        for task in tasks
+    ]
+
+    if algo == "binary":
+        insertion_sort(records, "title")
+        index = binary_search(records, title, "title")
+
+    elif algo == "linear":
+        index = linear_search(records, title, "title")
+
+    else:
+        raise HTTPException(
+            status_code=422,
+            detail="algo must be binary or linear"
+        )
+
+    if index == -1:
+        raise HTTPException(
+            status_code=404,
+            detail="Task not found"
+        )
+
+    task_id = records[index]["id"]
+
+    task = crud.get_task_by_id(
+        db,
+        task_id,
+        current_user.id
+    )
+
+    if task is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Task not found"
+        )
+
+    return task
 
 @app.get(
     "/tasks/{task_id}",
@@ -343,3 +426,58 @@ def project_statistics(
         db,
         current_user.id
     )
+
+# -----------------------------
+# AI QUICK-ADD
+# -----------------------------
+
+class QuickAddRequest(BaseModel):
+    description: str
+    project_id: int
+
+
+@app.post(
+    "/tasks/quick-add",
+    response_model=schemas.TaskResponse,
+    status_code=201
+)
+def quick_add_task(
+    data: QuickAddRequest,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    # Check project belongs to current user
+    project = crud.get_project_by_id(
+        db,
+        data.project_id,
+        current_user.id
+    )
+
+    if project is None:
+        raise HTTPException(
+            status_code=422,
+            detail="Project does not exist"
+        )
+
+    parsed = parse_quick_add(data.description)
+
+    task_data = schemas.TaskCreate(
+        title=parsed["title"],
+        priority=parsed["priority"],
+        due_date=parsed["due_date_hint"],
+        project_id=data.project_id
+    )
+
+    created_task = crud.create_task(
+        db,
+        task_data,
+        current_user.id
+    )
+
+    if created_task is None:
+        raise HTTPException(
+            status_code=422,
+            detail="Unable to create task"
+        )
+
+    return created_task
