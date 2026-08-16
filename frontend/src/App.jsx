@@ -36,7 +36,7 @@ function App() {
       formData.append("username", email);
       formData.append("password", password);
 
-      const response = await fetch("http://localhost:8000/login", {
+  const response = await fetch("http://127.0.0.1:8000/login", {
   method: "POST",
   headers: {
     "Content-Type": "application/x-www-form-urlencoded",
