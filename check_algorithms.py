@@ -1,10 +1,10 @@
-from backend.app.algorithms import (
+from backend.algorithms import (
     insertion_sort,
     binary_search,
     linear_search,
     insertion_sort_count,
     binary_search_count,
-    linear_search_count,
+    linear_search_count
 )
 
 
@@ -18,115 +18,168 @@ def check(case_name, result, expected):
 # 1. Empty list
 records = []
 insertion_sort(records, "title")
-check("insertion_sort empty list", records, [])
-
-
-# 2. Single element
-records = [{"title": "Only"}]
-insertion_sort(records, "title")
 check(
-    "insertion_sort single element",
+    "Insertion sort empty list",
     records,
-    [{"title": "Only"}]
+    []
 )
 
 
-# 3. Binary search - first
-records = [
-    {"title": "Alpha"},
-    {"title": "Beta"},
-    {"title": "Gamma"},
-]
+# 2. Single element
+records = [{"title": "Task A"}]
+insertion_sort(records, "title")
 check(
-    "binary_search first index",
-    binary_search(records, "Alpha", "title"),
+    "Insertion sort single element",
+    records,
+    [{"title": "Task A"}]
+)
+
+
+# 3. Sort normal list
+records = [
+    {"title": "Charlie"},
+    {"title": "Alpha"},
+    {"title": "Bravo"}
+]
+
+insertion_sort(records, "title")
+
+check(
+    "Insertion sort correctly sorts",
+    records,
+    [
+        {"title": "Alpha"},
+        {"title": "Bravo"},
+        {"title": "Charlie"}
+    ]
+)
+
+
+# Sorted list for binary search
+sorted_records = [
+    {"title": "Alpha"},
+    {"title": "Bravo"},
+    {"title": "Charlie"},
+    {"title": "Delta"},
+    {"title": "Echo"}
+]
+
+
+# 4. Binary search first
+result = binary_search(sorted_records, "Alpha", "title")
+check(
+    "Binary search first index",
+    result,
     0
 )
 
 
-# 4. Binary search - middle
+# 5. Binary search middle
+result = binary_search(sorted_records, "Charlie", "title")
 check(
-    "binary_search middle index",
-    binary_search(records, "Beta", "title"),
-    1
-)
-
-
-# 5. Binary search - last
-check(
-    "binary_search last index",
-    binary_search(records, "Gamma", "title"),
+    "Binary search middle index",
+    result,
     2
 )
 
 
-# 6. Binary search - absent
+# 6. Binary search last
+result = binary_search(sorted_records, "Echo", "title")
 check(
-    "binary_search not found",
-    binary_search(records, "Delta", "title"),
+    "Binary search last index",
+    result,
+    4
+)
+
+
+# 7. Binary search not found
+result = binary_search(sorted_records, "Zebra", "title")
+check(
+    "Binary search not found",
+    result,
     -1
 )
 
 
-# 7. insertion_sort_count
+# 8. Insertion sort count
 records = [
-    {"title": "C"},
-    {"title": "A"},
-    {"title": "B"},
+    {"title": "Charlie"},
+    {"title": "Alpha"},
+    {"title": "Bravo"}
 ]
 
 count = insertion_sort_count(records, "title")
 
-if records == [
-    {"title": "A"},
-    {"title": "B"},
-    {"title": "C"},
-] and type(count) == int and count > 0:
-    print("PASS: insertion_sort_count")
+if (
+    records
+    == [
+        {"title": "Alpha"},
+        {"title": "Bravo"},
+        {"title": "Charlie"}
+    ]
+    and type(count) == int
+    and count > 0
+):
+    print("PASS: Insertion sort count")
 else:
     print(
-        f"FAIL: insertion_sort_count — "
+        f"FAIL: Insertion sort count — "
         f"sorted={records}, count={count}"
     )
 
 
-# 8. binary_search_count
+# 9. Binary search count
 records = [
     {"title": "Alpha"},
-    {"title": "Beta"},
-    {"title": "Gamma"},
+    {"title": "Bravo"},
+    {"title": "Charlie"},
+    {"title": "Delta"},
+    {"title": "Echo"}
 ]
 
-result = binary_search_count(records, "Beta", "title")
+result = binary_search_count(
+    records,
+    "Charlie",
+    "title"
+)
 
 if (
-    isinstance(result, dict)
-    and result.get("index") == 1
-    and type(result.get("comparison_count")) == int
-    and result.get("comparison_count") > 0
+    type(result) == dict
+    and result["index"] == 2
+    and type(result["comparison_count"]) == int
+    and result["comparison_count"] > 0
 ):
-    print("PASS: binary_search_count")
+    print("PASS: Binary search count")
 else:
-    print(f"FAIL: binary_search_count — got {result}")
+    print(
+        f"FAIL: Binary search count — "
+        f"expected index 2, got {result}"
+    )
 
 
-# 9. linear_search_count absent
+# 10. Linear search count - absent value
 records = [
     {"title": "Alpha"},
-    {"title": "Beta"},
-    {"title": "Gamma"},
+    {"title": "Bravo"},
+    {"title": "Charlie"},
+    {"title": "Delta"}
 ]
 
-result = linear_search_count(records, "Delta", "title")
+result = linear_search_count(
+    records,
+    "Zebra",
+    "title"
+)
 
 if (
-    isinstance(result, dict)
-    and result.get("index") == -1
-    and result.get("comparison_count") == len(records)
+    type(result) == dict
+    and result["index"] == -1
+    and result["comparison_count"] == len(records)
 ):
-    print("PASS: linear_search_count")
+    print("PASS: Linear search count absent value")
 else:
-    print(f"FAIL: linear_search_count — got {result}")
-
-
-print("\nAlgorithm checks completed.")
+    print(
+        f"FAIL: Linear search count absent value — "
+        f"expected index -1 and comparisons {len(records)}, "
+        f"got {result}"
+    )

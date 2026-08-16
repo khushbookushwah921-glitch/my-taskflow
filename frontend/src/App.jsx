@@ -6,7 +6,8 @@ function App() {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [loggedIn, setLoggedIn] = useState(false);
-
+  const [quickAddText, setQuickAddText] = useState("");
+  const [quickAddLoading, setQuickAddLoading] = useState(false);
   const [projects, setProjects] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [showTaskForm, setShowTaskForm] = useState(false);
@@ -19,6 +20,11 @@ function App() {
   const [projectDescription, setProjectDescription] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [priorityFilter, setPriorityFilter] = useState("all");
+  const [editingTaskId, setEditingTaskId] = useState(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editPriority, setEditPriority] = useState("medium");
+  const [editDueDate, setEditDueDate] = useState("");
+  const [editProjectId, setEditProjectId] = useState("");
   const handleLogin = async (e) => {
     e.preventDefault();
     setMessage("Logging in...");
@@ -29,13 +35,13 @@ function App() {
       formData.append("username", email);
       formData.append("password", password);
 
-      const response = await fetch("http://127.0.0.1:8000/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: formData,
-      });
+      const response = await fetch("http://localhost:8000/login", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/x-www-form-urlencoded",
+  },
+  body: formData,
+});
 
       const data = await response.json();
 
@@ -188,14 +194,69 @@ const loadTasks = async (token) => {
     alert("Unable to connect to server.");
   }
 };
-  
-  const handleUpdateTaskStatus = async (taskId, currentStatus) => {
-   const token = localStorage.getItem("access_token");
 
-   const newStatus =
+const handleQuickAdd = async (e) => {
+  e.preventDefault();
+
+  if (!quickAddText.trim()) {
+    alert("Please describe your task.");
+    return;
+  }
+
+  if (!taskProjectId) {
+    alert("Please select a project first.");
+    return;
+  }
+
+  const token = localStorage.getItem("access_token");
+
+  setQuickAddLoading(true);
+
+  try {
+    const response = await fetch(
+      "http://127.0.0.1:8000/tasks/quick-add",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+        body: JSON.stringify({
+          description: quickAddText,
+          project_id: Number(taskProjectId),
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(data.detail || "AI Quick-Add failed");
+      return;
+    }
+
+    setTasks([...tasks, data]);
+    setQuickAddText("");
+
+    alert("AI task created successfully! 🤖");
+  } catch (error) {
+    console.error(error);
+    alert("Unable to connect to server.");
+  } finally {
+    setQuickAddLoading(false);
+  }
+};
+
+const handleUpdateTaskStatus = async (taskId, currentStatus) => {
+  const token = localStorage.getItem("access_token");
+
+  const newStatus =
     currentStatus === "completed" ? "pending" : "completed";
 
-   try {
+  console.log("Updating task:", taskId);
+  console.log("New status:", newStatus);
+
+  try {
     const response = await fetch(
       `http://127.0.0.1:8000/tasks/${taskId}`,
       {
@@ -210,10 +271,69 @@ const loadTasks = async (token) => {
       }
     );
 
-      const data = await response.json();
+    const data = await response.json();
+
+    console.log("UPDATE RESPONSE:", data);
 
     if (!response.ok) {
-      alert(data.detail || "Failed to update task");
+  console.log("STATUS UPDATE ERROR:", data);
+  alert(JSON.stringify(data.detail, null, 2));
+  return;
+}
+
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task.id === taskId ? data : task
+      )
+    );
+  } catch (error) {
+    console.error("UPDATE ERROR:", error);
+    alert("Unable to connect to server.");
+  }
+};
+  
+
+const handleEditTask = (task) => {
+  setEditingTaskId(task.id);
+  setEditTitle(task.title);
+  setEditPriority(task.priority);
+  setEditDueDate(task.due_date || "");
+  setEditProjectId(String(task.project_id));
+};
+
+const handleSaveEdit = async (taskId) => {
+  const token = localStorage.getItem("access_token");
+
+  const currentTask = tasks.find((task) => task.id === taskId);
+
+  try {
+    const response = await fetch(
+      `http://localhost:8000/tasks/${taskId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+        body: JSON.stringify({
+          title: editTitle,
+          priority: editPriority,
+          due_date: editDueDate || null,
+          project_id: Number(editProjectId),
+          status: currentTask?.status || "pending",
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.log("UPDATE ERROR:", data);
+      alert(
+        data.detail
+          ? JSON.stringify(data.detail)
+          : "Failed to update task"
+      );
       return;
     }
 
@@ -222,6 +342,10 @@ const loadTasks = async (token) => {
         task.id === taskId ? data : task
       )
     );
+
+    setEditingTaskId(null);
+
+    alert("Task updated successfully! ✏️");
   } catch (error) {
     console.error(error);
     alert("Unable to connect to server.");
@@ -538,6 +662,66 @@ const handleDeleteTask = async (taskId) => {
           </div>
 
         </div>
+        <section style={styles.section}>
+
+  <div style={styles.sectionHeader}>
+    <div>
+      <h2>🤖 AI Quick-Add</h2>
+      <p style={styles.sectionSubtitle}>
+        Describe your task naturally and let AI organize it.
+      </p>
+    </div>
+  </div>
+
+  <form onSubmit={handleQuickAdd} style={styles.taskForm}>
+
+    <div style={styles.formGroup}>
+      <label>Describe your task</label>
+
+      <input
+        type="text"
+        placeholder="e.g. Finish the report tomorrow high priority"
+        value={quickAddText}
+        onChange={(e) => setQuickAddText(e.target.value)}
+        style={styles.input}
+      />
+    </div>
+
+    <div style={styles.formGroup}>
+      <label>Project</label>
+
+      <select
+        value={taskProjectId}
+        onChange={(e) => setTaskProjectId(e.target.value)}
+        style={styles.input}
+        required
+      >
+        <option value="">Select Project</option>
+
+        {projects.map((project) => (
+          <option
+            key={project.id}
+            value={project.id}
+          >
+            {project.name}
+          </option>
+        ))}
+      </select>
+    </div>
+
+    <button
+      type="submit"
+      style={styles.createButton}
+      disabled={quickAddLoading}
+    >
+      {quickAddLoading
+        ? "Creating..."
+        : "🤖 Create with AI"}
+    </button>
+
+  </form>
+
+ </section>
 
         {/* ADD TASK */}
         <section style={styles.section}>
@@ -651,7 +835,6 @@ const handleDeleteTask = async (taskId) => {
           )}
 
         </section>
-
         {/* TASK LIST */}
         <section style={styles.section}>
 
@@ -742,8 +925,10 @@ const handleDeleteTask = async (taskId) => {
 
                   </div>
 
-                  <div style={styles.taskActions}>
+                  
 
+                  <div style={styles.taskActions}>
+                   
                     <button
                       style={styles.statusButton}
                       onClick={() =>
@@ -757,12 +942,98 @@ const handleDeleteTask = async (taskId) => {
                         ? "Mark Pending"
                         : "Mark Complete"}
                     </button>
+
+                    <button
+  style={styles.secondaryButton}
+  onClick={() => handleEditTask(task)}
+>
+  ✏️ Edit
+</button>
                     <button
   style={styles.deleteButton}
   onClick={() => handleDeleteTask(task.id)}
 >
   🗑 Delete
 </button>
+
+{editingTaskId === task.id && (
+  <div style={styles.taskForm}>
+
+    <div style={styles.formGroup}>
+      <label>Task Title</label>
+      <input
+        type="text"
+        value={editTitle}
+        onChange={(e) => setEditTitle(e.target.value)}
+        style={styles.input}
+      />
+    </div>
+
+    <div style={styles.formRow}>
+
+      <div style={styles.formGroup}>
+        <label>Priority</label>
+        <select
+          value={editPriority}
+          onChange={(e) => setEditPriority(e.target.value)}
+          style={styles.input}
+        >
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+        </select>
+      </div>
+
+      <div style={styles.formGroup}>
+        <label>Due Date</label>
+        <input
+          type="date"
+          value={editDueDate}
+          onChange={(e) => setEditDueDate(e.target.value)}
+          style={styles.input}
+        />
+      </div>
+
+      <div style={styles.formGroup}>
+        <label>Project</label>
+        <select
+          value={editProjectId}
+          onChange={(e) => setEditProjectId(e.target.value)}
+          style={styles.input}
+        >
+          {projects.map((project) => (
+            <option
+              key={project.id}
+              value={project.id}
+            >
+              {project.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+    </div>
+
+    <div style={styles.taskActions}>
+
+      <button
+        style={styles.createButton}
+        onClick={() => handleSaveEdit(task.id)}
+      >
+        Save Changes
+      </button>
+
+      <button
+        style={styles.secondaryButton}
+        onClick={() => setEditingTaskId(null)}
+      >
+        Cancel
+      </button>
+
+    </div>
+
+  </div>
+)}
 
                   </div>
 
@@ -1431,6 +1702,17 @@ liveDot: {
   animation: "livePulse 2.2s ease-in-out infinite",
 },
 
+editButton: {
+  marginTop: "10px",
+  padding: "9px 14px",
+  border: "1px solid #475569",
+  borderRadius: "7px",
+  background: "#1d4ed8",
+  color: "#ffffff",
+  cursor: "pointer",
+  fontSize: "14px",
+  fontWeight: "600",
+},
 
 };
 
