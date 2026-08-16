@@ -1,146 +1,67 @@
-\# TaskFlow
+# TaskFlow — Full-Stack AI-Assisted Task Management Platform
 
+TaskFlow is a full-stack task and project management application built for operations-engineering teams. It provides a relational backend, web dashboard, custom sorting/search algorithms, project statistics, and an AI-assisted quick-add feature.
 
+## Tech Stack
 
-TaskFlow is a full-stack task management application that helps users create projects, organize tasks, track task status, and manage their work efficiently.
+- Backend: FastAPI, SQLAlchemy, Pydantic
+- Database: SQLite
+- Frontend: HTML, CSS, JavaScript
+- Authentication: JWT Bearer Authentication
+- Algorithms: Insertion Sort, Binary Search, Linear Search
+- AI Quick-Add: Deterministic keyless rule-based parser
 
-
-
-\## Features
-
-
-
-\- User registration and login
-
-\- JWT-based authentication
-
-\- Secure password hashing
-
-\- Create and manage projects
-
-\- Create tasks under projects
-
-\- Task priority management
-
-\- Task due dates
-
-\- Mark tasks as pending or completed
-
-\- Delete tasks
-
-\- Search tasks
-
-\- Filter tasks by priority
-
-\- Dashboard with task statistics
-
-\- Responsive user interface
-
-\- Protected API endpoints
-
-
-
-\## Tech Stack
-
-
-
-\### Frontend
-
-\- React
-
-\- Vite
-
-\- JavaScript
-
-\- HTML
-
-\- CSS
-
-
-
-\### Backend
-
-\- FastAPI
-
-\- Python
-
-\- SQLAlchemy
-
-\- Pydantic
-
-\- JWT Authentication
-
-
-
-\### Database
-
-\- SQLite
-
-
-
-\### Development Tools
-
-\- Git
-
-\- GitHub
-
-\- VS Code
-
-
-
-\## Project Structure
-
-
+## Repository Structure
 
 ```text
-
 TaskFlow/
-
-│
-
 ├── backend/
-
-│   ├── app/
-
-│   │   ├── algorithms.py
-
-│   │   ├── auth.py
-
-│   │   ├── crud.py
-
-│   │   ├── database.py
-
-│   │   ├── main.py
-
-│   │   ├── models.py
-
-│   │   └── schemas.py
-
-│   │
-
-│   └── requirements.txt
-
-│
-
+│   └── app/
+│       ├── main.py
+│       ├── models.py
+│       ├── schemas.py
+│       ├── crud.py
+│       ├── database.py
+│       ├── auth.py
+│       ├── algorithms.py
+│       └── quick_add.py
 ├── frontend/
+│   ├── index.html
+│   ├── styles.css
+│   └── script.js
+├── check_algorithms.py
+├── benchmark.py
+└── README.md# TaskFlow — Full-Stack AI-Assisted Task Management Platform
 
-│   ├── src/
+TaskFlow is a full-stack task and project management application built for operations-engineering teams. It provides a relational backend, web dashboard, custom sorting/search algorithms, project statistics, and an AI-assisted quick-add feature.
 
-│   │   ├── App.jsx
+## Tech Stack
 
-│   │   ├── App.css
+- Backend: FastAPI, SQLAlchemy, Pydantic
+- Database: SQLite
+- Frontend: HTML, CSS, JavaScript
+- Authentication: JWT Bearer Authentication
+- Algorithms: Insertion Sort, Binary Search, Linear Search
+- AI Quick-Add: Deterministic keyless rule-based parser
 
-│   │   ├── index.css
+## Repository Structure
 
-│   │   └── main.jsx
-
-│   │
-
-│   ├── package.json
-
-│   └── vite.config.js
-
-│
-
+```text
+TaskFlow/
+├── backend/
+│   └── app/
+│       ├── main.py
+│       ├── models.py
+│       ├── schemas.py
+│       ├── crud.py
+│       ├── database.py
+│       ├── auth.py
+│       ├── algorithms.py
+│       └── quick_add.py
+├── frontend/
+│   ├── index.html
+│   ├── styles.css
+│   └── script.js
+├── check_algorithms.py
+├── benchmark.py
 └── README.md
-

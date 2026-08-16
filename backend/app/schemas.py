@@ -57,3 +57,14 @@ class TaskResponse(TaskCreate):
 
 class TaskStatusUpdate(BaseModel):
     status: str = Field(pattern="^(pending|in_progress|completed)$")
+
+class QuickAddRequest(BaseModel):
+    description: str
+    project_id: int
+
+    @field_validator("description")
+    @classmethod
+    def validate_description(cls, value):
+        if not value.strip():
+            raise ValueError("Description cannot be empty")
+        return value
